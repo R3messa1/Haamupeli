@@ -43,3 +43,32 @@ h2, h1, p {
 h3 {
     margin: 10px 10px;
 }
+
+button {
+    background-color: black;
+    color: white;
+    margin-left: 20px;
+    align-self: flex-start;
+    padding: 20px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#game-screen {
+    display: none;
+}
+
+#game-board {
+    display: grid;
+    gap: 0px;
+    background-image: url('images/background.png');
+    background-size: cover;
+    background-position: center;
+    width: 50vw fit-content;
+    height: 50vw fit-content;
+    margin: 10px auto;
+    border: 2px solid #333;
+    padding: 0px;
+    background-color: rgba(221, 221, 221, 0.8);
+}
