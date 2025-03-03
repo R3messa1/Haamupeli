@@ -72,3 +72,19 @@ button {
     padding: 0px;
     background-color: rgba(221, 221, 221, 0.8);
 }
+
+/* Yleinen määrittely kaikille pelikentän ruuduille */
+.cell {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Määrittely pelikentän seinäruuduille */
+.wall {
+    background-image: url('images/wall.png');
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+}
