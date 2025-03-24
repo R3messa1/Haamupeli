@@ -88,3 +88,8 @@ button {
     height: 50px;
     background-size: cover;
 }
+
+.player {
+    background-image: url('images/player.png'); /* Asetetaan pelaajalle kuva */
+    background-size: cover; /*Kuva kattaa koko ruudun */
+}

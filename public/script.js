@@ -1,10 +1,41 @@
 let BOARD_SIZE = 20 //Pelikentän koko
 const cellSize = calculateCellSize(); // Lasketaan ruudun koko responsiivisesti
 let board; //Kenttä tallennetaan tähän
+let player; //muuttuja pelaajalle
 
 // Haetaan nappi ja lisätään tapahtumankuuntelija
 document.getElementById('new-game-btn').addEventListener('click', startGame);
 
+// Tapahtumankuuntelija, joka reagoi näppäimistön painalluksiin
+document.addEventListener('keydown', (event) => {
+
+    switch (event.key){
+
+        // Tarkistetaan, mikä näppäin on painettu
+        case 'ArrowUp':
+            player.move(0, -1); // Liikuta pelaajaa yksi askel ylöspäin
+            break;
+
+        case 'ArrowDown':
+            player.move(0, 1); //Liikuta pelaajaa yksi askel alaspäin
+            break;
+
+        case 'ArrowLeft':
+            player.move(-1, 0); //Liikuta pelaajaa yksi askel vasemmalle
+            break;
+
+        case 'ArrowRight':
+            player.move(1, 0); // Liikuta pelaajaa yksi askel oikealle
+            break;
+
+    }
+    event.preventDefault(); // Estetään selaimen oletustoiminnot, kuten sivun vieritys
+});
+
+// Asettaa tietyn arvon esim 'P' pelaajalle tiettyyn ruutuun pelikentällä
+function setCell(board, x, y, value) {
+    board[y][x] = value; // Muutetaan pelikentän (board) koordinaatin (x, y) arvoksi 'value'
+}
 //Luodaan apufunktio joka hakee tietyn ruudun sisällön pelilaudasta
 function getCell(board, x, y) {
     return board[y][x]; //Palautetaan koordinaattien (x, y) kohdalla oleva arvo
@@ -25,6 +56,9 @@ function startGame(){
     document.getElementById('intro-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
 
+    //Luo uuden pelaajan ja sijoittaa sen koordinaatteihin (0,0)
+    player = new Player(0, 0);
+
     board = generateRandomBoard(); //Luo pelikenttä ja piirrä se
 
     drawBoard(board); // Piirretään pelikenttä HTML:n
@@ -34,7 +68,7 @@ function startGame(){
 
 function generateRandomBoard(){
     // Luodaan 2D-taulukko, joka täytetään tyhjillä soluilla (' ')
-    const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(''));
+    const newBoard = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(' '));
 
     // Käydään läpi pelikentän jokainen rivi
     for ( let y = 0; y < BOARD_SIZE; y++){
@@ -46,8 +80,14 @@ function generateRandomBoard(){
             }
         }
     }
+    generateObstacles(newBoard);
 
-    console.log(newBoard);
+    const [playerX, playerY] = randomEmptyPosition(newBoard); // haetaan satunnainen tyhjä paikka
+    setCell(newBoard, playerX, playerY, 'P'); // Asetetaan pelaaja tähän kohtaan
+    // Päivitetään pelaajan x- ja y-koordinaatit vastaamaan uutta sijaintia
+    player.x = playerX;
+    player.y = playerY;
+        
     return newBoard;
 }
 
@@ -55,6 +95,8 @@ function generateRandomBoard(){
 function drawBoard(board) {
     //Haetaan HTML-elementti, johon pelikenttä lisätään
     const gameBoard = document.getElementById('game-board'); 
+    // Tyhjennä olemassa oleva sisältö
+    gameBoard.innerHTML = '';
     // Asetetaan sarakkeet ja rivit pelikentän koon mukaisesti
     gameBoard.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
 
@@ -68,6 +110,8 @@ function drawBoard(board) {
 
             if (getCell(board, x, y) === 'W') {
                 cell.classList.add('wall');
+            } else if (getCell(board, x, y) === 'P'){ // Pelaaja lisätään ruudukkoon
+                cell.classList.add('player'); //'P pelaaja
             }
             gameBoard.appendChild(cell);
         }
@@ -115,5 +159,50 @@ function placeObstacle(board, obstacle, startX, startY){
 
         // Sijoitetaan esteen ruutu pelikentälle suhteessa aloituspisteeseen
         board[startY + y][startX + x] = 'W';
+    }
+}
+// Luo satunnaisen kokonaisluvun annettujen rajojen sisällä
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+// Etsii pelikentältä satunnaisen tyhjän ruudun ja palauttaa sen koordinaatit
+function randomEmptyPosition(board) {
+    x = randomInt(1, BOARD_SIZE - 2); //Satunnainen x-koordinaatti pelikentän sisäalueelta
+    y = randomInt(1, BOARD_SIZE - 2); // Satunnainen y-koordinaatti pelikentän sisäalueella
+
+    if (getCell(board, x, y) === ' '){
+        return [x, y]; // Jos ruutu on tyhjä (' '), palautetaan se
+    } else {
+        randomEmptyPosition(board); // Jos ruutu ei ole tyhjä, haetaan uusi satunnainen paikka
+    }
+}
+
+// Luodaan Player-luokka, joka hallitsee pelaajan sijaintia ja liikettä
+class Player {
+    constructor(x, y) {
+        this.x = x; // Tallennetaan pelaajan aloituspaikan x-koordinaatti
+        this.y = y; // Tallennetaan pelaajan aloituspaikan y-koordinaatti
+    }
+
+    // Funktio pelaajan liikuttamiseen
+    move(deltaX, deltaY) {
+        // Tallennetaan pelaajan nykyinen sijainti ennen liikettä
+        const currentX = player.x;
+        const currentY = player.y;
+
+        // Lasketaan uusi sijainti lisäämällä delta-arvot nykyiseen sijaintiin
+        const newX = currentX + deltaX;
+        const newY = currentY + deltaY;
+        if (getCell(board,newX,newY) === ' '){
+            // Päivitetään pelaajan uusi sijainti muuttujissa
+            player.x = newX;
+            player.y = newY;
+
+            // Päivitetään pelikenttä
+            board[currentY][currentX] = ' '; // Tyhjennetään vanha paikka pelikentällä
+            board[newY][newX] = 'P'; // Asetetään uusi sijainti pelikentälle pelaajaksi ('P')
+        }
+        // Piirretään pelikenttä uudelleen, jotta pelaajan liike näkyy visuaalisesti
+        drawBoard(board);
     }
 }
