@@ -2,6 +2,7 @@ let BOARD_SIZE = 20 //Pelikentän koko
 const cellSize = calculateCellSize(); // Lasketaan ruudun koko responsiivisesti
 let board; //Kenttä tallennetaan tähän
 let player; //muuttuja pelaajalle
+let ghosts = []; // Lista, johon tallennetaan kaikki ghost-oliot
 
 // Haetaan nappi ja lisätään tapahtumankuuntelija
 document.getElementById('new-game-btn').addEventListener('click', startGame);
@@ -82,6 +83,13 @@ function generateRandomBoard(){
     }
     generateObstacles(newBoard);
 
+    for (let i = 0; i < 5; i++){ //Luodaan 5 haamua
+        const [ghostX, ghostY] = randomEmptyPosition(newBoard); // Haetaan satunnainen tyhjä paikka kentältä
+        setCell(newBoard, ghostX, ghostY, 'H'); // Asetetaan haamu 'H' pelikentän matriisiin
+        ghosts.push(new Ghost(ghostX, ghostY)); // Luodaan uusi Ghost-olio ja lisätään se ghost-listaan
+    }
+
+
     const [playerX, playerY] = randomEmptyPosition(newBoard); // haetaan satunnainen tyhjä paikka
     setCell(newBoard, playerX, playerY, 'P'); // Asetetaan pelaaja tähän kohtaan
     // Päivitetään pelaajan x- ja y-koordinaatit vastaamaan uutta sijaintia
@@ -112,6 +120,8 @@ function drawBoard(board) {
                 cell.classList.add('wall');
             } else if (getCell(board, x, y) === 'P'){ // Pelaaja lisätään ruudukkoon
                 cell.classList.add('player'); //'P pelaaja
+            } else if (getCell(board, x, y) === 'H'){ //Jos ruudussa on 'H' eli haamu
+                cell.classList.add('hornmonster'); // Lisätään haamun CSS-luokka, joka näyttää sen kuvana
             }
             gameBoard.appendChild(cell);
         }
@@ -205,4 +215,18 @@ class Player {
         // Piirretään pelikenttä uudelleen, jotta pelaajan liike näkyy visuaalisesti
         drawBoard(board);
     }
+}
+
+// Kummitusten luokka
+class Ghost {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+function shootAt(x, y) {
+
+    setCell(board, x, y, 'B');
+    drawBoard(board);
 }

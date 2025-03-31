@@ -93,3 +93,8 @@ button {
     background-image: url('images/player.png'); /* Asetetaan pelaajalle kuva */
     background-size: cover; /*Kuva kattaa koko ruudun */
 }
+
+.hornmonster {
+    background-image: url('images/hornmonster.png'); /*haamun kuva*/
+    background-size: cover; /* Skaalaa kuva siististi täyttämään ruutu */
+}
