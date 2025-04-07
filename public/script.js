@@ -29,6 +29,21 @@ document.addEventListener('keydown', (event) => {
             player.move(1, 0); // Liikuta pelaajaa yksi askel oikealle
             break;
 
+        case 'w':
+            shootAt(player.x, player.y -1); // Ammutaan ylöspäin
+            break;
+        
+        case 's':
+            shootAt(player.x, player.y + 1); // Ammutaan alaspain
+            break;
+
+        case 'a':
+            shootAt(player.x - 1, player.y); // Ammutaan vasemmalle
+            break;
+
+        case 'd':
+            shootAt(player.x + 1, player.y); // Ammutaan oikealle
+
     }
     event.preventDefault(); // Estetään selaimen oletustoiminnot, kuten sivun vieritys
 });
@@ -122,6 +137,11 @@ function drawBoard(board) {
                 cell.classList.add('player'); //'P pelaaja
             } else if (getCell(board, x, y) === 'H'){ //Jos ruudussa on 'H' eli haamu
                 cell.classList.add('hornmonster'); // Lisätään haamun CSS-luokka, joka näyttää sen kuvana
+            } else if (getCell(board, x, y) === 'B'){
+                cell.classList.add('bullet'); //B on ammus
+                setTimeout(() => {
+                    setCell(board, x, y, ' ')
+                }, 500); // Ammus katoaa 0.5 sekunnin jälkeen
             }
             gameBoard.appendChild(cell);
         }
@@ -227,6 +247,34 @@ class Ghost {
 
 function shootAt(x, y) {
 
+    // Tarkistetaan, osuuko ammus seinään ennen ampumista
+    if (getCell(board, x, y) === 'W') {
+        //Jos ruudussa on seinä ('W'), ei tehdä mitään
+        return;
+    }
+
+    // Etsitään, onko haamu samassa ruudussa mihin ammutaan
+    const ghostIndex = ghosts.findIndex(ghost => ghost.x === x && ghost.y === y);
+
+    if (ghostIndex !== -1) {
+        //Jos haamu löytyy, poistetaan se haamujen listasta
+        ghosts.splice(ghostIndex, 1); // Poistaa yhden haamun listasta
+        updateScoreBoard(50); // Lisätään pisteitä (esim. 50 pistettä osumasta)
+    }
+    // Asetetaan ruutuun 'B' eli ammus, jotta se näkyy pelissä
     setCell(board, x, y, 'B');
+
+    // Piirretään peli uudelleen, jotta ammus näkyy
     drawBoard(board);
+
+    // Tarkistetaan, onko kaikki haamut poistettu pelistä
+    if (ghosts.length === 0){
+        // Jos kaikki haamut on ammuttu, siirrytään seuraavalle tasolle
+        alert('kaikki ammuttu');
+    }
+}
+
+function moveGhosts() {
+    // Tallennetaan kaikkien haamujen nykyiset sijainnit ennen kuin niitä liikutetaan
+const oldGhosts = ghosts.map(ghost => ({ x: ghost.x, y: ghost.y}));
 }
