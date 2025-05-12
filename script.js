@@ -406,6 +406,7 @@ function moveGhosts() {
 }
 
 function endGame(){
+    // Huom viimeinen!! (17)
     console.log('endGame käynnistyi'); // TESTAUSTA VARTEN
 
     // Asetetaan peli päättyneeksi
