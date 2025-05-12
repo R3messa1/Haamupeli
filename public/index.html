@@ -4,29 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Haamupeli</title>
+    <!-- (1) Firebase App (compat-versio) -->
+    <!-- Lataa Firebase-kirjaston ytimen -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+
+    <!-- (2) Firestore (compat-versio) -->
+    <!-- Lataa Firestore-tietokantatoiminnot -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+
+    <!-- (3) Bootstrap CSS (ulkoasun komponentteja ja grid-järjestelmä) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- (4) Bootstrap JavaScript (tarvitaan joihinkin komponentteihin) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="intro-screen">
-        <h1>Tervetuloa pelaamaan Haamupeliä</h1>
-        <p>Ammu hirviöt päästäksesi seuraavalle tasolle.</p>
-        <h2>Hirviöt:</h2>
-        <div>
-            <img src="images/hornmonster.png" alt="Horn Monster">
-            <div>
-                <h3>Horn Monster </h3>
-                <p>An orange demon with menacing horns. 
-                    This relentless fiend constantly hunts the player, moving directly towards them. 
-                    When obstructed, Horny resorts to ran-dom movement. Its speed is notably brisk, 
-                    adding a sense of urgency to the chase.</p>
+    <!-- (5) Intro Page - koko etusivun näkymä jaettu kahteen sarakkeeseen -->
+    <div id="intro-page">
+        <div class="row">
+            <!-- Vasen sarake: Pelin esittely -->
+            <div class="col-sm-6">
+                <div id="intro-screen">
+                    <h1>Tervetuloa pelaamaan Haamupeliä</h1>
+                    <p>Ammu hirviöt päästäksesi seuraavalle tasolle.</p>
+                    <h2>Hirviöt:</h2>
+                    <div>
+                        <img src="images/hornmonster.png" alt="Horn Monster">
+                        <div>
+                            <h3>Horn Monster</h3>
+                            <p>An orange demon with menacing horns.
+                                This relentless fiend constantly hunts the player, moving directly towards them.
+                                When obstructed, Horny resorts to random movement. Its speed is notably brisk,
+                                adding a sense of urgency to the chase.</p>
+                        </div>
+                    </div>
+                    <div id="monster-selection"> 
+                        <button id="new-game-btn">Aloita peli</button>
+                    </div>
+                </div>
             </div>
-
+            <!-- Oikea sarake: Top 10 pistetaulukko -->
+            <div class="col-sm-6">
+                <div id="best-scores-board">
+                    <h2>Parhaat pisteet</h2>
+                    <div id="top-ten-scores"></div>
+                </div>
+            </div>
         </div>
-
-    <div id="monster-selection">
-        <button id="new-game-btn">Aloita peli</button>
-    </div>
     </div>
 
     <div id="game-screen">
@@ -36,6 +63,15 @@
     </div>
 
     <div id="score-board"></div>
+
+    <!-- (6) Game Over -ikkuna -->
+    <div id="game-over-screen">
+        <h1>Pelisi on ohi</h1>
+        <p>Haluatko tallentaa pisteesi</p>
+        <input type="text" id="player-name" placeholder="Nimesi">
+        <button id="save-scores-btn">Kyllä</button>
+        <button id="exit-btn">Ei</button>
+    </div>
     
 </body>
 </html>

@@ -1,3 +1,21 @@
+// (9)
+const firebaseConfig = {
+    apiKey: "AIzaSyApE7YRPsLWHXtHId2xs6GYyRr1RFt7WMg",
+    authDomain: "haamupeli-1ff7e.firebaseapp.com",
+    projectId: "haamupeli-1ff7e",
+    storageBucket: "haamupeli-1ff7e.firebasestorage.app",
+    messagingSenderId: "505146684563",
+    appId: "1:505146684563:web:27ccee7ea8b75cc8a84966",
+    measurementId: "G-ZBG2KHW5H9"
+  };
+
+// (10) Alustetaan Firebase-projekti ja otetaan Firestore käyttöön
+firebase.initializeApp(firebaseConfig); // Yhdistetään omaan Firebase-projektiin
+const db = firebase.firestore();        // Otetaan tietokanta (Firestore) käyttöön
+
+// (11)
+showTop10(); // Näytetään parhaat 10 pistettä heti kun peli latautuu
+
 let BOARD_SIZE = 20 //Pelikentän koko
 const cellSize = calculateCellSize(); // Lasketaan ruudun koko responsiivisesti
 let board; //Kenttä tallennetaan tähän
@@ -10,6 +28,10 @@ let score = 0; //Pistelaskuri
 
 // Haetaan nappi ja lisätään tapahtumankuuntelija
 document.getElementById('new-game-btn').addEventListener('click', startGame);
+
+// (15)
+document.getElementById("save-scores-btn").addEventListener('click', saveScore);
+document.getElementById('exit-btn').addEventListener('click', exitGame);
 
 function updateScoreBoard(points){
 
@@ -64,7 +86,10 @@ document.addEventListener('keydown', (event) => {
 
         }
     }    
-    event.preventDefault(); // Estetään selaimen oletustoiminnot, kuten sivun vieritys
+     // (16) Estetään oletustoiminnot (esim. sivun vieritys), mutta sallitaan kirjoittaminen input-kenttään
+     if (document.activeElement.tagName !== "INPUT") {
+        event.preventDefault();
+    }
 });
 
 // Asettaa tietyn arvon esim 'P' pelaajalle tiettyyn ruutuun pelikentällä
@@ -88,7 +113,7 @@ function calculateCellSize(){
 
 function startGame(){
     // Piilotetaan intro-näkymä ja näytetään pelialue
-    document.getElementById('intro-screen').style.display = 'none';
+    document.getElementById('intro-page').style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
 
     // Merkitään peli käynnissä olevaksi
@@ -337,7 +362,7 @@ function shootAt(x, y) {
     // Tarkistetaan, onko kaikki haamut poistettu pelistä
     if (ghosts.length === 0){
         // Jos kaikki haamut on ammuttu, siirrytään seuraavalle tasolle
-        alert('kaikki ammuttu'); //Tämä pois
+        startNextLevel();
     }
 }
 
@@ -392,7 +417,7 @@ function endGame(){
     clearInterval(ghostInterval);
 
     // Näytetään aloitusnäkymä uudelleen (pelaaja voi aloittaa uuden pelin)
-    document.getElementById('intro-screen').style.display = 'block';
+    document.getElementById('intro-page').style.display = 'block';
 
     // Piilotetaan pelinäkymä, koska peli päättyi
     document.getElementById('game-screen').style.display = 'none';
@@ -420,3 +445,59 @@ function startNextLevel() {
         ghostInterval = setInterval(moveGhosts, ghostSpeed);
     }, 1000); // 1000 ms = 1 sekunti
 }
+
+  // (12) Tämä funktio tallentaa pelaajan syöttämän nimen ja pisteet Firestore-tietokantaan
+  function saveScore() {
+    const playerName = document.getElementById('player-name').value; // Haetaan syötetty nimi input-kentästä
+  
+    if (playerName.trim() === '') { // Jos kenttä on tyhjä tai sisältää pelkkiä välilyöntejä
+      alert('Please enter your name.'); // Näytetään virheilmoitus
+      return; // Keskeytetään tallennus
+    }
+  
+    // Lisätään uusi pistetulos "scores"-kokoelmaan Firestoreen
+    db.collection("scores").add({
+      name: playerName, // Pelaajan nimi
+      score: score, // Pelaajan pistemäärä
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() // Tallennetaan aikaleima
+    });
+  
+    exitGame(); // Palataan aloitusnäkymään
+  }
+
+// (13)
+function exitGame() {
+    document.getElementById('intro-page').style.display = 'block'; // Näytetään aloitusnäkymä
+    document.getElementById('game-screen').style.display = 'none'; // Piilotetaan pelialue
+    document.getElementById('game-over-screen').style.display = 'none'; // Piilotetaan pelin jälkeinen ikkuna
+    showTop10(); // Päivitetään näkyviin top 10 -pistetaulukko
+  }
+  
+
+  // (14) Tämä funktio hakee Firestore-tietokannasta 10 parasta pistettä ja näyttää ne HTML-sivulla
+function showTop10() {
+    console.log('showTop10'); // Konsoliin viesti, että funktio on käynnissä
+  
+    // Haetaan kokoelmasta "scores" tiedot järjestettynä suurimmasta pienimpään pistemäärään
+    db.collection("scores")
+      .orderBy("score", "desc") // Järjestetään pisteet laskevaan järjestykseen
+      .limit(10)                // Otetaan mukaan vain 10 parasta
+      .get()
+      .then(snapshot => {
+        const container = document.getElementById("top-ten-scores"); // Etsitään HTML-elementti, johon lista näytetään
+  
+        container.innerHTML = ""; // Tyhjennetään vanha sisältö ennen uuden listan näyttämistä
+  
+        const ol = document.createElement("ol"); // Luodaan järjestetty lista (ol = ordered list)
+  
+        // Käydään läpi jokainen dokumentti (tulos), joka saatiin tietokannasta
+        snapshot.forEach(doc => {
+          const data = doc.data(); // Haetaan dokumentin tiedot
+          const li = document.createElement("li"); // Luodaan uusi listaelementti
+          li.textContent = `${data.name}: ${data.score}`; // Muotoillaan teksti (esim. "Anna: 150")
+          ol.appendChild(li); // Lisätään listaelementti listaan
+        });
+  
+        container.appendChild(ol); // Lisätään valmis lista HTML-elementtiin
+      });
+  }
