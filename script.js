@@ -417,10 +417,10 @@ function endGame(){
     clearInterval(ghostInterval);
 
     // Näytetään aloitusnäkymä uudelleen (pelaaja voi aloittaa uuden pelin)
-    document.getElementById('intro-page').style.display = 'block';
+    //document.getElementById('intro-page').style.display = 'block';
 
     // Piilotetaan pelinäkymä, koska peli päättyi
-    document.getElementById('game-screen').style.display = 'none';
+    document.getElementById('game-over_screen').style.display = 'block';
 }
 
 function startNextLevel() {
