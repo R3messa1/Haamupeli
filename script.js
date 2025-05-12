@@ -406,6 +406,7 @@ function moveGhosts() {
 }
 
 function endGame(){
+    console.log('endGame käynnistyi'); // TESTAUSTA VARTEN
 
     // Asetetaan peli päättyneeksi
     isGameRunning = false;
