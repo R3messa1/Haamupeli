@@ -420,7 +420,7 @@ function endGame(){
     //document.getElementById('intro-page').style.display = 'block';
 
     // Piilotetaan pelinäkymä, koska peli päättyi
-    document.getElementById('game-over_screen').style.display = 'block';
+    document.getElementById('game-over-screen').style.display = 'block';
 }
 
 function startNextLevel() {
